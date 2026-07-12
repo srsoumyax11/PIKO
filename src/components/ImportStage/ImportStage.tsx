@@ -1,9 +1,9 @@
 import React, { useRef, useState } from "react";
-import { usePhotos } from "../../context/PhotoContext";
+import { usePhotoStore } from "../../store/usePhotoStore";
 import type { PhotoItem } from "../../types/photo";
 
 export function ImportStage() {
-  const { addPhotos } = usePhotos();
+  const addPhotos = usePhotoStore(state => state.addPhotos);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 

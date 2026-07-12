@@ -1,4 +1,4 @@
-import { usePhotos } from "../../context/PhotoContext";
+import { usePhotoStore } from "../../store/usePhotoStore";
 import { getDisplayUrl } from "../../lib/photoUtils";
 
 export function FooterFilmstrip({
@@ -8,7 +8,7 @@ export function FooterFilmstrip({
   activePhotoId: string | null;
   onSelect: (id: string) => void;
 }) {
-  const { photos } = usePhotos();
+  const photos = usePhotoStore(state => state.photos);
 
   if (photos.length === 0) return null;
 

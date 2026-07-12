@@ -1,4 +1,4 @@
-import { usePhotos } from "../../context/PhotoContext";
+import { usePhotoStore } from "../../store/usePhotoStore";
 import { getDisplayUrl } from "../../lib/photoUtils";
 
 interface Props {
@@ -6,7 +6,7 @@ interface Props {
 }
 
 export function PhotoThumbnailGrid({ onPhotoSelect }: Props) {
-  const { photos } = usePhotos();
+  const photos = usePhotoStore(state => state.photos);
 
   if (photos.length === 0) return null;
 

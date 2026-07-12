@@ -5,12 +5,14 @@ import { drawPhotoCell } from "../../../lib/photoRenderer";
 import { Slider } from "../../ui/Slider";
 
 interface LayoutWorkspaceProps {
-  photos: PhotoItem[];
   photo: PhotoItem; // fallback for size when empty
-  printSettings: PrintSettings;
 }
 
-export function LayoutWorkspace({ photos, photo, printSettings }: LayoutWorkspaceProps) {
+import { usePhotoStore } from "../../../store/usePhotoStore";
+
+export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
+  const photos = usePhotoStore(state => state.photos);
+  const printSettings = usePhotoStore(state => state.printSettings);
   const containerRef = useRef<HTMLDivElement>(null);
   const [baseScale, setBaseScale] = useState(1);
   const [zoom, setZoom] = useState(1);

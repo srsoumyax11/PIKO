@@ -1,11 +1,12 @@
-import { usePhotos } from "../../context/PhotoContext";
+import { usePhotoStore } from "../../store/usePhotoStore";
 import { downloadPDF, downloadImage } from "../../lib/export";
 import { Button } from "../ui/Button";
 
 export function Topbar() {
-  const { photos, printSettings } = usePhotos();
+  const photos = usePhotoStore(state => state.photos);
+  const printSettings = usePhotoStore(state => state.printSettings);
 
-  const selectedForPrint = photos.filter(p => p.isSelectedForPrint);
+  const selectedForPrint = photos.filter(p => p.printCopies > 0 || p.isSelectedForPrint);
   // In the original App.tsx, we fallback to activePhoto if selectedForPrint is empty.
   // We can just rely on selectedForPrint or a prop if we want, but for now we'll 
   // do what the original did if we pass activePhotoId, or just print what's selected.

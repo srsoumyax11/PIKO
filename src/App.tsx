@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { PhotoProvider, usePhotos } from "./context/PhotoContext";
+import { usePhotoStore } from "./store/usePhotoStore";
 import { ImportStage } from "./components/ImportStage/ImportStage";
 import { PhotoThumbnailGrid } from "./components/PhotoThumbnailGrid/PhotoThumbnailGrid";
 import { EditStage } from "./components/EditStage/EditStage";
@@ -13,7 +13,7 @@ import "./layout.css";
 function AppShell() {
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Import");
-  const { photos } = usePhotos();
+  const photos = usePhotoStore(state => state.photos);
 
   const activePhoto = photos.find(p => p.id === activePhotoId);
 
@@ -118,11 +118,7 @@ function AppShell() {
 }
 
 function App() {
-  return (
-    <PhotoProvider>
-      <AppShell />
-    </PhotoProvider>
-  );
+  return <AppShell />;
 }
 
 export default App;

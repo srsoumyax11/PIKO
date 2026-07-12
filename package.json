@@ -15,7 +15,8 @@
     "jspdf": "^4.2.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-easy-crop": "^6.2.2"
+    "react-easy-crop": "^6.2.2",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@types/node": "^24.13.2",

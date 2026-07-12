@@ -1,4 +1,4 @@
-import { usePhotos } from "../../context/PhotoContext";
+import { usePhotoStore } from "../../store/usePhotoStore";
 import { usePhotoPipeline } from "./hooks/usePhotoPipeline";
 
 // Workspaces
@@ -21,8 +21,8 @@ interface EditStageProps {
 }
 
 export function EditStage({ photoId, activeTab }: EditStageProps) {
-  const { photos, updatePhoto, printSettings, updatePrintSettings } = usePhotos();
-  const photo = photos.find(p => p.id === photoId);
+  const photo = usePhotoStore(state => state.photos.find(p => p.id === photoId));
+  const updatePhoto = usePhotoStore(state => state.updatePhoto);
 
   // Hook handles Layer 2/3 cache generation and AI bg removal
   const {
@@ -42,7 +42,7 @@ export function EditStage({ photoId, activeTab }: EditStageProps) {
   // ── Main workspace area ──
   const renderWorkspace = () => {
     if (activeTab === "Layout") {
-      return <LayoutWorkspace photos={photos} photo={photo} printSettings={printSettings} />;
+      return <LayoutWorkspace photo={photo} />;
     }
     if (activeTab === "Crop") {
       return <CropWorkspace photo={photo} aspect={aspect} updatePhoto={updatePhoto} />;
@@ -78,11 +78,7 @@ export function EditStage({ photoId, activeTab }: EditStageProps) {
     } else if (activeTab === "Layout") {
       content = (
         <LayoutPanel 
-          photos={photos} 
           photo={photo} 
-          updatePhoto={updatePhoto} 
-          printSettings={printSettings} 
-          updatePrintSettings={updatePrintSettings} 
         />
       );
     }

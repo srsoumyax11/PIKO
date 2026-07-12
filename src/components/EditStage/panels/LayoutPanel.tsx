@@ -6,11 +6,7 @@ import { ColorPicker } from "../../ui/ColorPicker";
 import { getDisplayUrl } from "../../../lib/photoUtils";
 
 interface LayoutPanelProps {
-  photos: PhotoItem[];
   photo: PhotoItem; // current active photo (for maxW fallback)
-  updatePhoto: (id: string, updates: Partial<PhotoItem>) => void;
-  printSettings: PrintSettings;
-  updatePrintSettings: (updates: Partial<PrintSettings>) => void;
 }
 
 const INP: React.CSSProperties = {
@@ -20,7 +16,13 @@ const INP: React.CSSProperties = {
   boxSizing: "border-box"
 };
 
-export function LayoutPanel({ photos, photo, updatePhoto, printSettings, updatePrintSettings }: LayoutPanelProps) {
+import { usePhotoStore } from "../../../store/usePhotoStore";
+
+export function LayoutPanel({ photo }: LayoutPanelProps) {
+  const photos = usePhotoStore(state => state.photos);
+  const printSettings = usePhotoStore(state => state.printSettings);
+  const updatePrintSettings = usePhotoStore(state => state.updatePrintSettings);
+  const updatePhoto = usePhotoStore(state => state.updatePhoto);
   const printPhotos = photos.filter(p => p.printCopies > 0);
   const totalCopies = photos.reduce((s, p) => s + (p.printCopies || 0), 0);
   const pageDim = PAGE_SIZES[printSettings.pageSize];
