@@ -59,7 +59,6 @@ export type PhotoItem = {
   printSize: PrintSize;
   isSelectedForPrint: boolean;    // Checkbox in Layout gallery
   printCopies: number;            // Number input: how many copies of this photo to print
-  borderMm: number;               // White/color border around each printed photo (0 = none)
 
   // ── STATUS ───────────────────────────────────────────────────
   status: "imported" | "bg-processed" | "cropped" | "adjusted" | "ready";

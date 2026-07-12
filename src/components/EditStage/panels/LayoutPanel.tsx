@@ -1,5 +1,5 @@
 import type { PhotoItem } from "../../../types/photo";
-import { computeLayout, PAGE_SIZES, type PrintSettings, type PageSizeKey } from "../../../lib/layoutEngine";
+import { computeLayout, PAGE_SIZES, type PageSizeKey } from "../../../lib/layoutEngine";
 import { Select } from "../../ui/Select";
 import { Button } from "../../ui/Button";
 import { ColorPicker } from "../../ui/ColorPicker";

@@ -40,7 +40,6 @@ export function ImportStage() {
         printSize: { name: "Passport", widthMm: 35, heightMm: 45 },
         isSelectedForPrint: true,
         printCopies: 6,
-        borderMm: 0,
         status: "imported",
       };
       

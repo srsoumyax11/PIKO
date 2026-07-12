@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { PhotoItem, PhotoCaption } from "../../../types/photo";
 import { getDisplayUrl } from "../../../lib/photoUtils";
 import { CHECKER } from "../../../lib/constants";
+import { usePhotoStore } from "../../../store/usePhotoStore";
 
 interface PreviewWorkspaceProps {
   photo: PhotoItem;
@@ -11,6 +12,7 @@ interface PreviewWorkspaceProps {
 export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
   const previewRef = useRef<HTMLDivElement>(null);
   const [previewHeightPx, setPreviewHeightPx] = useState(0);
+  const borderMm = usePhotoStore(state => state.printSettings.borderMm);
 
   useEffect(() => {
     const el = previewRef.current;
@@ -24,7 +26,7 @@ export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
   const bgColor = photo.bgColor || "#ffffff";
   const isTransparent = bgColor === "transparent";
   const checkerStyle = isTransparent ? CHECKER : {};
-  const borderPx = (photo.borderMm || 0) * 3; // Note: temporary naive mm to px conversion, replaced in layout canvas
+  const borderPx = (borderMm || 0) * 3; // Note: temporary naive mm to px conversion, replaced in layout canvas
 
   const renderCaptionOverlay = (cap: PhotoCaption) => {
     if (cap.position !== "overlay-bottom" && cap.position !== "overlay-top") return null;

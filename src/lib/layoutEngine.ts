@@ -34,7 +34,7 @@ export const DEFAULT_PRINT_SETTINGS: PrintSettings = {
   cols: 6,
   showCutLines: true,
   cutLineColor: "#cccccc",
-  borderMm: 0,
+  borderMm: 1,
   borderColor: "#ffffff",
 };
 
