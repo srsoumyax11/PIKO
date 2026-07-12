@@ -128,7 +128,7 @@ export function drawPhotoCell(
     ctx.textAlign = cap.align;
 
     const barPadH = fPx * 0.5;
-    const maxWidth = wPx - (barPadH * 2);
+    const maxWidth = imgW - (barPadH * 2);
     const lineHeight = fPx * 1.4;
 
     // Word wrap algorithm
@@ -154,24 +154,24 @@ export function drawPhotoCell(
 
     let barY: number;
     if (cap.position === "overlay-bottom") {
-      barY = yPx + hPx - barH;
+      barY = imgY + imgH - barH;
     } else if (cap.position === "overlay-top") {
-      barY = yPx;
+      barY = imgY;
     } else {
-      barY = yPx + hPx - barH;
+      barY = imgY + imgH - barH;
     }
 
     if (cap.bgColor && cap.bgColor !== "transparent") {
       ctx.fillStyle = cap.bgColor;
-      ctx.fillRect(xPx, barY, wPx, barH);
+      ctx.fillRect(imgX, barY, imgW, barH);
     }
 
     ctx.fillStyle = cap.color;
     const textX = cap.align === "left"
-      ? xPx + barPadH
+      ? imgX + barPadH
       : cap.align === "right"
-      ? xPx + wPx - barPadH
-      : xPx + wPx / 2;
+      ? imgX + imgW - barPadH
+      : imgX + imgW / 2;
 
     // Draw each line
     // startY is calculated so that the block of text is vertically centered in the bar
