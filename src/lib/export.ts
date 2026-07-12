@@ -21,12 +21,12 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 
 // ─────────────────────────────────────────────────────────────────
 // Generate a multi-photo print sheet for all selected photos.
-// Returns one data URL (JPEG) per page.
+// Returns one Blob (JPEG) per page.
 // ─────────────────────────────────────────────────────────────────
 export async function generatePrintSheets(
   photos: PhotoItem[],
   settings: PrintSettings
-): Promise<string[]> {
+): Promise<Blob[]> {
   // Any photo with copies > 0 is included — no separate checkbox needed
   const selected = photos.filter(p => p.printCopies > 0);
   if (selected.length === 0) return [];
@@ -62,7 +62,7 @@ export async function generatePrintSheets(
   const canvasH = Math.round(pageDim.h * MM_TO_PX);
 
   // Render one canvas per page
-  const pageDataUrls: string[] = [];
+  const pageBlobs: Blob[] = [];
 
   for (let pageIdx = 0; pageIdx < layoutResult.totalPages; pageIdx++) {
     const canvas = document.createElement("canvas");
@@ -92,10 +92,13 @@ export async function generatePrintSheets(
       drawPhotoCell(ctx, img, photo, xPx, yPx, wPx, hPx, PRINT_DPI, settings);
     }
 
-    pageDataUrls.push(canvas.toDataURL("image/jpeg", 0.95));
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/jpeg", 0.95));
+    if (blob) {
+      pageBlobs.push(blob);
+    }
   }
 
-  return pageDataUrls;
+  return pageBlobs;
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -105,8 +108,8 @@ export async function generatePrintSheets(
 import { DEFAULT_PRINT_SETTINGS } from "./layoutEngine";
 
 export async function downloadPDF(photos: PhotoItem[], settings: PrintSettings = DEFAULT_PRINT_SETTINGS) {
-  const dataUrls = await generatePrintSheets(photos, settings);
-  if (dataUrls.length === 0) return;
+  const blobs = await generatePrintSheets(photos, settings);
+  if (blobs.length === 0) return;
 
   const pageDim = PAGE_SIZES[settings.pageSize];
   const pdf = new jsPDF({
@@ -115,22 +118,30 @@ export async function downloadPDF(photos: PhotoItem[], settings: PrintSettings =
     format: [pageDim.w, pageDim.h],
   });
 
-  dataUrls.forEach((url, i) => {
+  for (let i = 0; i < blobs.length; i++) {
+    const blob = blobs[i];
+    const arrayBuffer = await blob.arrayBuffer();
+    const uint8Array = new Uint8Array(arrayBuffer);
+    
     if (i > 0) pdf.addPage([pageDim.w, pageDim.h]);
-    pdf.addImage(url, "JPEG", 0, 0, pageDim.w, pageDim.h);
-  });
+    pdf.addImage(uint8Array, "JPEG", 0, 0, pageDim.w, pageDim.h);
+  }
 
   pdf.save("piko-photos.pdf");
 }
 
 export async function downloadImage(photos: PhotoItem[], settings: PrintSettings = DEFAULT_PRINT_SETTINGS) {
-  const dataUrls = await generatePrintSheets(photos, settings);
-  if (dataUrls.length === 0) return;
+  const blobs = await generatePrintSheets(photos, settings);
+  if (blobs.length === 0) return;
 
-  dataUrls.forEach((url, i) => {
+  blobs.forEach((blob, i) => {
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
     link.download = `piko-photos-page${i + 1}.jpg`;
     link.click();
+    
+    // Revoke the object URL after a short delay to free memory
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
 }
