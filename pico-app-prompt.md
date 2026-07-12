@@ -1,13 +1,13 @@
-# Project prompt: Pico
+# Project prompt: Piko
 
-Build a web app called Pico. It automates the manual work a photo studio does when printing passport size photos: crop, enhance, sharpen, remove background, arrange multiple copies on a page, then print or save as PDF.
+Build a web app called Piko. It automates the manual work a photo studio does when printing passport size photos: crop, enhance, sharpen, remove background, arrange multiple copies on a page, then print or save as PDF.
 
 Everything runs in the browser. No backend server, no image upload to any server. All processing (editing, background removal, layout, export) happens on the client machine.
 
 ## Tech stack
 
 - Runtime and package manager: Bun
-- Framework: React (Vite template, `bun create vite pico --template react`)
+- Framework: React (Vite template, `bun create vite piko --template react`)
 - Language: TypeScript
 - State: React state plus Context, no need for Redux at this scale
 - Styling: Tailwind CSS
