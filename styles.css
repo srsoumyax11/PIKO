@@ -1,0 +1,692 @@
+/* ==========================================================================
+   PASSPORT PHOTO STUDIO — design tokens
+   Palette:
+     --ink        #1B1D1F  near-black charcoal, primary text
+     --paper      #F6F4EF  soft warm paper background
+     --steel      #5A6169  muted blue-grey, secondary text
+     --line       #DDD8CD  hairline borders on paper
+     --focus      #147D7A  "viewfinder" teal — primary accent / brackets
+     --focus-dim  #E4EFEE  tinted teal surface
+     --shutter    #D6473F  shutter red — capture action
+   Type:
+     display/UI  -> Space Grotesk
+     body        -> Manrope
+     utility/mono-> JetBrains Mono (measurements, step counters)
+   ========================================================================== */
+
+:root {
+  --ink: #1B1D1F;
+  --paper: #F6F4EF;
+  --paper-raised: #FFFFFF;
+  --steel: #5A6169;
+  --line: #DDD8CD;
+  --focus: #147D7A;
+  --focus-dim: #E4EFEE;
+  --shutter: #D6473F;
+  --shutter-dim: #FBE6E4;
+
+  --radius-s: 6px;
+  --radius-m: 12px;
+  --radius-l: 20px;
+
+  --shadow-soft: 0 1px 2px rgba(27, 29, 31, 0.06), 0 8px 24px rgba(27, 29, 31, 0.06);
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Manrope', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ==========================================================================
+   TOP BAR
+   ========================================================================== */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.wordmark-mark {
+  color: var(--focus);
+  font-size: 20px;
+}
+
+.steps {
+  display: flex;
+  list-style: none;
+  margin: 0; padding: 0;
+  gap: 28px;
+}
+
+.step {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: var(--steel);
+  opacity: 0.45;
+  transition: opacity 0.35s var(--ease);
+}
+
+.step.is-active { opacity: 1; }
+
+.step.is-complete { opacity: 0.85; }
+
+.step-index {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--focus);
+}
+
+.step-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ==========================================================================
+   APP SHELL / SCREENS
+   ========================================================================== */
+
+.app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+.screen {
+  display: none;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 40px;
+  align-items: start;
+  animation: screen-in 0.5s var(--ease);
+}
+
+.screen.is-active { display: grid; }
+
+@keyframes screen-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 780px) {
+  .screen { grid-template-columns: 1fr; }
+}
+
+.stage {
+  display: flex;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   SIGNATURE ELEMENT — viewfinder corner brackets
+   Every active surface (camera, crop canvas, print sheet) sits inside this
+   frame. The brackets are the recurring visual thread of the whole app.
+   ========================================================================== */
+
+.frame {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 4 / 5;
+  background: var(--ink);
+  border-radius: var(--radius-m);
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+}
+
+.frame--brackets::before,
+.frame--brackets::after {
+  content: "";
+  position: absolute;
+  width: 26px; height: 26px;
+  border: 2.5px solid var(--focus);
+  z-index: 3;
+  transition: border-color 0.3s var(--ease);
+}
+
+/* top-left + bottom-right via pseudo-elements */
+.frame--brackets::before {
+  top: 12px; left: 12px;
+  border-right: none; border-bottom: none;
+  border-top-left-radius: 4px;
+}
+.frame--brackets::after {
+  bottom: 12px; right: 12px;
+  border-left: none; border-top: none;
+  border-bottom-right-radius: 4px;
+}
+
+.frame-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Global hidden utility */
+.is-hidden { display: none !important; }
+
+/* Upload Dropzone */
+.upload-dropzone {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-raised);
+  cursor: pointer;
+  z-index: 2;
+  transition: background 0.2s var(--ease);
+}
+.upload-dropzone:hover,
+.frame.is-dragover .upload-dropzone {
+  background: var(--focus-dim);
+}
+.upload-dropzone-content {
+  text-align: center;
+  color: var(--steel);
+  pointer-events: none;
+}
+.upload-icon {
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+.upload-dropzone-content p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.upload-dropzone-content span {
+  color: var(--focus);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.frame-hint {
+  position: absolute;
+  inset: auto 0 18px 0;
+  margin: 0 auto;
+  text-align: center;
+  color: #F2F1EC;
+  font-size: 13px;
+  font-family: 'JetBrains Mono', monospace;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Crop guide vertical line */
+.crop-guide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-left: 1px dashed rgba(255, 255, 255, 0.7);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* shutter flash pulse on capture */
+.flash {
+  position: absolute;
+  inset: 0;
+  background: #FFFFFF;
+  opacity: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+.flash.is-flashing {
+  animation: flash-pulse 0.42s var(--ease);
+}
+@keyframes flash-pulse {
+  0%   { opacity: 0; }
+  15%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+
+/* ==========================================================================
+   PANEL (right-hand contextual controls)
+   ========================================================================== */
+
+.panel {
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  padding: 28px;
+}
+
+.panel-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+
+.panel-copy {
+  color: var(--steel);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0 0 22px;
+}
+
+.panel-note {
+  color: var(--shutter);
+  font-size: 13px;
+  margin-top: 14px;
+}
+
+.panel-hint {
+  font-size: 12.5px;
+  color: var(--steel);
+  border-left: 2px solid var(--focus);
+  padding-left: 10px;
+  margin: 18px 0;
+}
+
+.panel-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.panel-controls.is-hidden { display: none; }
+
+.btn-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--steel);
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  padding: 13px 22px;
+  transition: transform 0.18s var(--ease), box-shadow 0.18s var(--ease), background 0.18s var(--ease), opacity 0.18s var(--ease);
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn--primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+.btn--primary:hover { box-shadow: 0 6px 16px rgba(27,29,31,0.22); transform: translateY(-1px); }
+
+.btn--ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn--ghost:hover { border-color: var(--steel); }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* circular shutter button */
+.btn--shutter {
+  width: 62px; height: 62px;
+  border-radius: 50%;
+  padding: 0;
+  background: var(--shutter);
+  position: relative;
+  box-shadow: 0 0 0 4px var(--shutter-dim);
+}
+.btn--shutter-ring {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.75);
+}
+.btn--shutter:hover:not(:disabled) { box-shadow: 0 0 0 6px var(--shutter-dim); }
+.btn--shutter:active:not(:disabled) { transform: scale(0.92); }
+
+/* ==========================================================================
+   CROP SCREEN — presets, custom inputs, zoom slider
+   ========================================================================== */
+
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.preset-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
+  padding: 12px 14px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  background: var(--paper);
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.preset-chip:hover { border-color: var(--focus); }
+
+.preset-chip.is-active {
+  background: var(--focus-dim);
+  border-color: var(--focus);
+}
+
+.preset-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 13.5px;
+}
+
+.preset-dims {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  color: var(--steel);
+}
+
+.custom-inputs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.custom-inputs.is-hidden { display: none; }
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--steel);
+  flex: 1;
+}
+
+/* Photo Tips */
+.photo-tips {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-s);
+  padding: 16px;
+  margin: 18px 0;
+}
+.tips-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 14px;
+  margin: 0 0 10px;
+  color: var(--ink);
+}
+.tips-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--steel);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.tips-list li {
+  margin-bottom: 4px;
+}
+.tips-list li:last-child {
+  margin-bottom: 0;
+}
+
+.field input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  padding: 9px 10px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink);
+}
+.field input:focus {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+}
+
+.slider-block { margin-bottom: 6px; }
+
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--steel);
+  margin-bottom: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.slider-value { color: var(--ink); }
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--focus);
+}
+
+/* ==========================================================================
+   TABS (Crop / Adjust / Background)
+   ========================================================================== */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--paper-raised);
+  border: 1px solid var(--line);
+  padding: 4px;
+  border-radius: var(--radius-m);
+  margin-bottom: 24px;
+}
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px;
+  border-radius: var(--radius-s);
+  cursor: pointer;
+  color: var(--steel);
+  transition: all 0.2s var(--ease);
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.is-active {
+  background: var(--focus-dim);
+  color: var(--focus);
+}
+
+.tab-content { display: none; animation: screen-in 0.3s var(--ease); }
+.tab-content.is-active { display: block; }
+
+/* Background UI */
+.bg-disclaimer {
+  font-size: 12px;
+  color: var(--steel);
+  background: var(--paper-raised);
+  padding: 12px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--line);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+.color-swatches {
+  display: flex;
+  gap: 12px;
+}
+.color-swatch {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), border-color 0.2s var(--ease);
+}
+.color-swatch:hover { transform: scale(1.05); }
+.color-swatch.is-active {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px var(--focus-dim);
+}
+
+/* ==========================================================================
+   PRINT-PREVIEW SCREEN (on-screen sheet mock-up, NOT the print output)
+   ========================================================================== */
+
+.stage--print { flex-direction: column; align-items: center; gap: 14px; }
+
+.frame--sheet {
+  aspect-ratio: 4 / 6;
+  max-width: 300px;
+  background: #FFFFFF;
+}
+
+.print-sheet {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6%;
+  padding: 6%;
+}
+
+.print-sheet .cell {
+  background: #eee;
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(27,29,31,0.08);
+}
+
+.print-sheet .cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sheet-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--steel);
+  text-align: center;
+}
+
+.spec-list {
+  list-style: none;
+  margin: 0 0 22px;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.spec-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.spec-list .mono {
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--focus);
+}
+
+/* ==========================================================================
+   PRINT OUTPUT
+   The .print-only sheet is the ONLY element visible when printing.
+   It is built to exact 4in x 6in physical dimensions with zero page margin.
+   ========================================================================== */
+
+.print-only { display: none; }
+
+@page {
+  size: 4in 6in;
+  margin: 0;
+}
+
+@media print {
+  html, body {
+    width: 4in;
+    height: 6in;
+    margin: 0;
+    padding: 0;
+    background: #FFFFFF;
+  }
+
+  /* hide the entire interactive app */
+  .topbar, .app { display: none !important; }
+
+  .print-only {
+    display: block;
+    width: 4in;
+    height: 6in;
+    margin: 0;
+    padding: 0;
+  }
+
+  .print-only .print-sheet {
+    width: 4in;
+    height: 6in;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    /* gap + padding below are fallbacks only: layout.js sets both directly
+       as inline styles (in real inches) so screen preview and print output
+       always match exactly, regardless of the chosen crop's aspect ratio */
+    gap: 0.09in;
+    padding: 0.09in;
+    box-sizing: border-box;
+  }
+
+  .print-only .cell {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .print-only .cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
