@@ -65,6 +65,7 @@ export function BackgroundPanel({
         value={photo.bgColor && !BACKGROUND_COLORS.find(c => c.value === photo.bgColor) && photo.bgColor !== "transparent" ? photo.bgColor : "#ffffff"}
         onChange={(val) => updatePhoto(photo.id, { bgColor: val })}
         allowTransparent={true}
+        hidePresets={true}
       />
     </div>
   );

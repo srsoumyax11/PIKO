@@ -1,13 +1,12 @@
-import React from "react";
-
 interface ColorPickerProps {
   label: string;
   value: string;
   onChange: (val: string) => void;
   allowTransparent?: boolean;
+  hidePresets?: boolean;
 }
 
-export function ColorPicker({ label, value, onChange, allowTransparent }: ColorPickerProps) {
+export function ColorPicker({ label, value, onChange, allowTransparent, hidePresets }: ColorPickerProps) {
   const isTransparent = value === "transparent";
 
   const presets = [
@@ -27,7 +26,7 @@ export function ColorPicker({ label, value, onChange, allowTransparent }: ColorP
       </label>
       
       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "8px" }}>
-        {presets.map(c => (
+        {!hidePresets && presets.map(c => (
           <div 
             key={c.name}
             title={c.name}

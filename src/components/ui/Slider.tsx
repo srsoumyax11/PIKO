@@ -1,5 +1,5 @@
 interface SliderProps {
-  label: string;
+  label?: string;
   value: number;
   min: number;
   max: number;
@@ -11,10 +11,12 @@ interface SliderProps {
 export function Slider({ label, value, min, max, step = 1, unit = "", onChange }: SliderProps) {
   return (
     <div className="slider-block">
-      <div className="slider-label">
-        <span>{label}</span>
-        <span className="slider-value">{value}{unit}</span>
-      </div>
+      {label !== undefined && (
+        <div className="slider-label">
+          <span>{label}</span>
+          <span className="slider-value">{value}{unit}</span>
+        </div>
+      )}
       <input 
         type="range" 
         min={min} 
