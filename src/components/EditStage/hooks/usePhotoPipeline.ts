@@ -65,19 +65,14 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
     if (!photo) return;
     setIsRemovingBg(true);
     cancelBgRef.current = false;
-    let sim = 0;
-    setBgProgress("Removing background... 0%");
+    setBgProgress("Initializing AI...");
     
-    const iv = setInterval(() => {
-      sim = Math.min(90, sim + Math.floor(Math.random() * 3) + 1);
-      setBgProgress(`Removing background... ${sim}%`);
-    }, 150);
-
     try {
-      const url = await removeBg(photo.originalDataUrl, () => {});
+      const url = await removeBg(photo.originalDataUrl, (progress) => {
+        setBgProgress(progress);
+      });
       if (cancelBgRef.current) return;
-      clearInterval(iv);
-      setBgProgress("Finishing up... 100%");
+      setBgProgress("Finishing up...");
       await new Promise(r => setTimeout(r, 300));
       updatePhoto(photo.id, {
         bgRemoved: true,
@@ -90,7 +85,6 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
     } catch (e) {
       console.error("BG removal failed", e);
     } finally {
-      clearInterval(iv);
       setIsRemovingBg(false);
       setBgProgress("");
     }

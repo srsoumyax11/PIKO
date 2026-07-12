@@ -8,7 +8,7 @@ export async function removeBg(
     progress: (key: string, current: number, total: number) => {
       const percent = Math.round((current / total) * 100);
       if (key.includes("fetch")) {
-        onProgress(`Loading Fast AI model... ${percent}%`);
+        onProgress(`Downloading AI Model... ${percent}% (One-time, will be cached)`);
       } else if (key.includes("compute")) {
         onProgress(`Removing background... ${percent}%`);
       } else {

@@ -18,7 +18,12 @@ export function BackgroundPanel({
 }: BackgroundPanelProps) {
   return (
     <div>
-      <p className="panel-copy">Use AI to remove the background automatically.</p>
+      <p className="panel-copy">
+        Use AI to remove the background automatically.<br/>
+        <span style={{ opacity: 0.7, fontSize: "10px", marginTop: "4px", display: "inline-block" }}>
+          (A ~40MB AI model will download on your first use. It will be cached securely for instant offline use afterwards.)
+        </span>
+      </p>
       <div style={{ marginBottom: "24px" }}>
         {isRemovingBg ? (
           <Button variant="primary" style={{ backgroundColor: "var(--steel)", borderColor: "var(--steel)" }} fullWidth onClick={handleCancelBg}>
