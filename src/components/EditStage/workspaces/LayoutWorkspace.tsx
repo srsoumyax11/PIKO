@@ -63,7 +63,7 @@ export function LayoutWorkspace({ photos, photo, printSettings }: LayoutWorkspac
 
     ro.observe(el);
     return () => ro.disconnect();
-  }, [pageDim.w, pageDim.h]);
+  }, [pageDim.w, pageDim.h, printPhotos.length > 0]);
 
   if (printPhotos.length === 0 || !layout) {
     return (
