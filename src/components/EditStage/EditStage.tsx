@@ -13,7 +13,6 @@ import { BackgroundPanel } from "./panels/BackgroundPanel";
 import { AdjustPanel } from "./panels/AdjustPanel";
 import { CaptionPanel } from "./panels/CaptionPanel";
 import { LayoutPanel } from "./panels/LayoutPanel";
-import { PRESETS } from "../../lib/constants";
 
 interface EditStageProps {
   photoId: string;

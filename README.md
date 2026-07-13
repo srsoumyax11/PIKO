@@ -55,10 +55,14 @@ PIKO generates a perfectly spaced, high-resolution layout grid.
 <!-- Replace with an actual screenshot of the final layout export -->
 
 <div align="center">
-  <img src="docs/output-example-placeholder.png" alt="Example Print Layout" width="600" />
+  <img src="demo/image/output-example-placeholder.png" alt="Example Print Layout" width="600" />
   <p><em>Example: Six 35x45mm photos automatically tiled onto a 4x6" print sheet with cutting guidelines.</em></p>
 </div>
 
+<!-- Gif video showing the entire pipeline working in browser -->
+<div align="center">
+  <img src="demo/gif/animation.gif" alt="PIKO in action" width="600" />
+</div>
 ---
 
 ## 🛠️ Tech Stack & Development
