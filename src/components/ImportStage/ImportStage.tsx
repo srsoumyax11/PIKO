@@ -5,6 +5,7 @@ import { validateImageFile } from "../../lib/fileValidator";
 
 export function ImportStage() {
   const addPhotos = usePhotoStore(state => state.addPhotos);
+  const updatePhotoPrintSettings = usePhotoStore(state => state.updatePhotoPrintSettings);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
@@ -45,10 +46,7 @@ export function ImportStage() {
         adjustedDataUrl: undefined,
         // Caption
         caption: undefined,
-        // Print settings
-        printSize: { name: "Passport", widthMm: 35, heightMm: 45 },
-        isSelectedForPrint: true,
-        printCopies: 6,
+        // Status
         status: "imported",
       };
       
@@ -60,6 +58,14 @@ export function ImportStage() {
     }
     if (newPhotos.length > 0) {
       addPhotos(newPhotos);
+      newPhotos.forEach(photo => {
+        updatePhotoPrintSettings(photo.id, {
+          photoId: photo.id,
+          printSize: { name: "Passport", widthMm: 35, heightMm: 45 },
+          printCopies: 6,
+          isSelectedForPrint: true
+        });
+      });
     }
   };
 

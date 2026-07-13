@@ -4,6 +4,7 @@ import { getDisplayUrl } from "../../../lib/photoUtils";
 import { CHECKER } from "../../../lib/constants";
 import { usePhotoStore } from "../../../store/usePhotoStore";
 import { drawPhotoCell } from "../../../lib/photoRenderer";
+import { getCanvasContext } from "../../../lib/canvas";
 
 interface PreviewWorkspaceProps {
   photo: PhotoItem;
@@ -13,7 +14,7 @@ interface PreviewWorkspaceProps {
 export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const printSettings = usePhotoStore(state => state.printSettings);
+  const printSession = usePhotoStore(state => state.printSession);
   
   const [size, setSize] = useState({ w: 0, h: 0 });
 
@@ -39,8 +40,7 @@ export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = getCanvasContext(canvas, "2d");
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = size.w * dpr;
@@ -53,13 +53,13 @@ export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
     const imgSrc = getDisplayUrl(photo);
     const img = new Image();
     img.onload = () => {
-      // Calculate fake DPI for the preview based on print size
-      const screenDpi = (size.h / (photo.printSize.heightMm || 45)) * 25.4;
+      const s = printSession.photoSettings[photo.id];
+      const screenDpi = (size.h / (s?.printSize.heightMm || 45)) * 25.4;
 
-      drawPhotoCell(ctx, img, photo, 0, 0, size.w, size.h, screenDpi, printSettings);
+      drawPhotoCell(ctx, img, photo, 0, 0, size.w, size.h, screenDpi, printSession);
     };
     img.src = imgSrc;
-  }, [photo, size, printSettings]);
+  }, [photo, size, printSession]);
 
   const bgColor = photo.bgColor || "#ffffff";
   const isTransparent = bgColor === "transparent";

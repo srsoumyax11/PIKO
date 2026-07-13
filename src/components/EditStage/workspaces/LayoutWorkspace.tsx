@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { PhotoItem } from "../../../types/photo";
-import { computeLayout, PAGE_SIZES, type PrintSettings, type LayoutResult } from "../../../lib/layoutEngine";
+import { computeLayout, PAGE_SIZES } from "../../../lib/layoutEngine";
 import { drawPhotoCell } from "../../../lib/photoRenderer";
+import { getCanvasContext } from "../../../lib/canvas";
 import { Slider } from "../../ui/Slider";
 
 interface LayoutWorkspaceProps {
@@ -12,30 +13,41 @@ import { usePhotoStore } from "../../../store/usePhotoStore";
 
 export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
   const photos = usePhotoStore(state => state.photos);
-  const printSettings = usePhotoStore(state => state.printSettings);
+  const printSession = usePhotoStore(state => state.printSession);
   const containerRef = useRef<HTMLDivElement>(null);
   const [baseScale, setBaseScale] = useState(1);
   const [zoom, setZoom] = useState(1);
   const [canvasLogicalSize, setCanvasLogicalSize] = useState({ w: 0, h: 0 });
 
-  const printPhotos = photos.filter(p => p.printCopies > 0);
-  const pageDim = PAGE_SIZES[printSettings.pageSize];
+  const printPhotos = photos.filter(p => (printSession.photoSettings[p.id]?.printCopies || 0) > 0);
+  const pageDim = PAGE_SIZES[printSession.pageSize];
 
-  const maxW = printPhotos.length > 0 ? Math.max(...printPhotos.map(p => p.printSize.widthMm || 35)) : (photo.printSize.widthMm || 35);
-  const avail = pageDim.w - printSettings.marginMm * 2;
-  const autoCols = Math.max(1, Math.floor((avail + printSettings.gapMm) / (maxW + printSettings.gapMm)));
+  let maxW = 35;
+  if (printPhotos.length > 0) {
+    maxW = Math.max(...printPhotos.map(p => printSession.photoSettings[p.id]?.printSize.widthMm || 35));
+  } else {
+    maxW = printSession.photoSettings[photo.id]?.printSize.widthMm || 35;
+  }
+
+  const avail = pageDim.w - printSession.marginMm * 2;
+  const autoCols = Math.max(1, Math.floor((avail + printSession.gapMm) / (maxW + printSession.gapMm)));
   
   const layout = printPhotos.length > 0
     ? computeLayout(
-        { ...printSettings, cols: autoCols },
-        printPhotos.map(p => ({
-          photoId: p.id,
-          widthMm: p.printSize.widthMm || 35,
-          heightMm: p.printSize.heightMm || 45,
-          copies: p.printCopies
-        }))
+        { ...printSession, cols: autoCols },
+        printPhotos.map(p => {
+          const s = printSession.photoSettings[p.id];
+          return {
+            photoId: p.id,
+            widthMm: s?.printSize.widthMm || 35,
+            heightMm: s?.printSize.heightMm || 45,
+            copies: s?.printCopies || 0
+          };
+        })
       )
     : null;
+
+  const hasPhotos = printPhotos.length > 0;
 
   // 1. Calculate how to scale the A4/page canvas down to fit the screen
   useEffect(() => {
@@ -65,7 +77,7 @@ export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
 
     ro.observe(el);
     return () => ro.disconnect();
-  }, [pageDim.w, pageDim.h, printPhotos.length > 0]);
+  }, [pageDim.w, pageDim.h, hasPhotos]);
 
   if (printPhotos.length === 0 || !layout) {
     return (
@@ -78,7 +90,6 @@ export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
 
   const zoomedW = canvasLogicalSize.w * zoom;
   const zoomedH = canvasLogicalSize.h * zoom;
-  const currentScale = baseScale * zoom;
 
   return (
     <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", boxSizing: "border-box" }}>
@@ -111,8 +122,8 @@ export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
             pageIndex={i}
             layout={layout}
             printPhotos={printPhotos}
-            printSettings={printSettings}
-            scale={currentScale}
+            printSession={printSession}
+            scale={baseScale * zoom}
             width={zoomedW}
             height={zoomedH}
           />
@@ -122,36 +133,25 @@ export function LayoutWorkspace({ photo }: LayoutWorkspaceProps) {
   );
 }
 
-interface PageCanvasProps {
-  pageIndex: number;
-  layout: LayoutResult;
-  printPhotos: PhotoItem[];
-  printSettings: PrintSettings;
-  scale: number;
-  width: number;
-  height: number;
-}
-
-function PageCanvas({ pageIndex, layout, printPhotos, printSettings, scale, width, height }: PageCanvasProps) {
+function PageCanvas({ pageIndex, layout, printPhotos, printSession, scale, width, height }: any) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas || width === 0) return;
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const ctx = getCanvasContext(canvas, "2d");
 
     const dpr = window.devicePixelRatio || 1;
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.scale(dpr, dpr);
 
-    const cells = layout.cells.filter(c => c.pageIndex === pageIndex);
+    const cells = layout.cells.filter((c: any) => c.pageIndex === pageIndex);
 
-    const loadPromises = cells.map(cell => {
+    const loadPromises = cells.map((cell: any) => {
       return new Promise<{ cell: typeof cell, img: HTMLImageElement, cp: PhotoItem } | null>((resolve) => {
-        const cp = printPhotos.find(p => p.id === cell.photoId);
+        const cp = printPhotos.find((p: any) => p.id === cell.photoId);
         if (!cp) return resolve(null);
 
         const imgSrc = cp.adjustedDataUrl || cp.croppedDataUrl || cp.bgRemovedDataUrl || cp.originalDataUrl;
@@ -176,10 +176,12 @@ function PageCanvas({ pageIndex, layout, printPhotos, printSettings, scale, widt
         const hPx = cell.heightMm * scale;
         const screenDpi = scale * 25.4;
 
-        drawPhotoCell(ctx, img, cp, xPx, yPx, wPx, hPx, screenDpi, printSettings);
+        const s = printSession.photoSettings[cell.photoId];
+        if (!s) return;
+        drawPhotoCell(ctx, img, cp, xPx, yPx, wPx, hPx, screenDpi, printSession);
       });
     }).catch(console.error);
-  }, [layout, pageIndex, printPhotos, printSettings, scale, width, height]);
+  }, [pageIndex, layout, printPhotos, printSession, width, height, scale]);
 
   return (
     <div style={{ position: "relative", width: `${width}px`, height: `${height}px`, flexShrink: 0 }}>

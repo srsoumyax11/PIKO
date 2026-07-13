@@ -1,5 +1,13 @@
 import { applySharpen } from "./sharpen";
 
+export function getCanvasContext(canvas: HTMLCanvasElement, contextType: '2d'): CanvasRenderingContext2D {
+  const ctx = canvas.getContext(contextType);
+  if (!ctx) {
+    throw new Error(`Failed to get ${contextType} context from canvas`);
+  }
+  return ctx;
+}
+
 export const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
     const image = new Image();
@@ -22,11 +30,7 @@ export async function getCroppedImg(
 ): Promise<string> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
-  const ctx = canvas.getContext("2d");
-
-  if (!ctx) {
-    throw new Error("No 2d context");
-  }
+  const ctx = getCanvasContext(canvas, '2d');
 
   // Set canvas size to match the bounding box of the rotated image
   const rotRad = getRadianAngle(rotation);
@@ -48,11 +52,7 @@ export async function getCroppedImg(
 
   // Now extract the cropped area
   const croppedCanvas = document.createElement("canvas");
-  const croppedCtx = croppedCanvas.getContext("2d");
-
-  if (!croppedCtx) {
-    throw new Error("No 2d context");
-  }
+  const croppedCtx = getCanvasContext(croppedCanvas, '2d');
 
   croppedCanvas.width = pixelCrop.width;
   croppedCanvas.height = pixelCrop.height;
@@ -78,8 +78,7 @@ export async function getAdjustedImg(imageSrc: string, brightness: number, contr
   const canvas = document.createElement("canvas");
   canvas.width = image.width;
   canvas.height = image.height;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) throw new Error("No 2d context");
+  const ctx = getCanvasContext(canvas, '2d');
 
   ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
   ctx.drawImage(image, 0, 0);

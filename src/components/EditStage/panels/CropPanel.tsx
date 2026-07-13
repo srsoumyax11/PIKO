@@ -1,6 +1,7 @@
 import type { PhotoItem } from "../../../types/photo";
 import { PRESETS } from "../../../lib/constants";
 import { Slider } from "../../ui/Slider";
+import { usePhotoStore } from "../../../store/usePhotoStore";
 
 interface CropPanelProps {
   photo: PhotoItem;
@@ -8,6 +9,11 @@ interface CropPanelProps {
 }
 
 export function CropPanel({ photo, updatePhoto }: CropPanelProps) {
+  const printSession = usePhotoStore(state => state.printSession);
+  const updatePhotoPrintSettings = usePhotoStore(state => state.updatePhotoPrintSettings);
+  
+  const currentSettings = printSession.photoSettings[photo.id];
+  const printSizeName = currentSettings?.printSize?.name || "Passport";
   return (
     <div>
       <p className="panel-section-label">Print Size</p>
@@ -15,12 +21,16 @@ export function CropPanel({ photo, updatePhoto }: CropPanelProps) {
         {PRESETS.map(preset => (
           <div
             key={preset.name}
-            className={`preset-chip ${photo.printSize?.name === preset.name ? "is-active" : ""}`}
-            onClick={() => updatePhoto(photo.id, {
-              printSize: { name: preset.name, widthMm: preset.width, heightMm: preset.height },
-              croppedDataUrl: undefined,
-              adjustedDataUrl: undefined
-            })}
+            className={`preset-chip ${printSizeName === preset.name ? "is-active" : ""}`}
+            onClick={() => {
+              updatePhotoPrintSettings(photo.id, {
+                printSize: { name: preset.name, widthMm: preset.width, heightMm: preset.height }
+              });
+              updatePhoto(photo.id, {
+                croppedDataUrl: undefined,
+                adjustedDataUrl: undefined
+              });
+            }}
           >
             <span className="preset-name">{preset.name}</span>
             <span className="preset-dims">{preset.width ? `${preset.width}×${preset.height}mm` : "Free"}</span>

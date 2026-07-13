@@ -4,9 +4,12 @@ import { Button } from "../ui/Button";
 
 export function Topbar() {
   const photos = usePhotoStore(state => state.photos);
-  const printSettings = usePhotoStore(state => state.printSettings);
+  const printSession = usePhotoStore(state => state.printSession);
 
-  const selectedForPrint = photos.filter(p => p.printCopies > 0 || p.isSelectedForPrint);
+  const selectedForPrint = photos.filter(p => {
+    const settings = printSession.photoSettings[p.id];
+    return settings && (settings.printCopies > 0 || settings.isSelectedForPrint);
+  });
   // In the original App.tsx, we fallback to activePhoto if selectedForPrint is empty.
   // We can just rely on selectedForPrint or a prop if we want, but for now we'll 
   // do what the original did if we pass activePhotoId, or just print what's selected.
@@ -15,17 +18,17 @@ export function Topbar() {
 
   const handleDownloadPDF = () => {
     if (selectedForPrint.length > 0) {
-      downloadPDF(selectedForPrint, printSettings);
+      downloadPDF(selectedForPrint, printSession);
     } else if (photos.length > 0) {
-      downloadPDF(photos, printSettings);
+      downloadPDF(photos, printSession);
     }
   };
 
   const handleDownloadImage = () => {
     if (selectedForPrint.length > 0) {
-      downloadImage(selectedForPrint, printSettings);
+      downloadImage(selectedForPrint, printSession);
     } else if (photos.length > 0) {
-      downloadImage(photos, printSettings);
+      downloadImage(photos, printSession);
     }
   };
 

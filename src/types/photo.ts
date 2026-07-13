@@ -24,18 +24,25 @@ export type PrintSize = {
   heightMm: number;
 };
 
-export type PhotoItem = {
+export type PhotoCore = {
   id: string;
 
   // ── LAYER 0: IMPORT (Immutable) ──────────────────────────────
   originalFile: File;
   originalDataUrl: string;        // Raw uploaded image. Never mutated.
 
+  // ── STATUS ───────────────────────────────────────────────────
+  status: "imported" | "bg-processed" | "cropped" | "adjusted" | "ready";
+
+  // ── CLEANUP ──────────────────────────────────────────────────
+  _blobUrlsToCleanup?: string[];
+};
+
+export type PhotoLayers = {
   // ── LAYER 1: BACKGROUND STAGE ────────────────────────────────
   bgRemoved: boolean;             // Operation flag: use transparent version?
   bgColor: string;                // CSS fill color behind the transparent photo
   bgRemovedDataUrl?: string;      // CACHE: AI result. Kept forever once computed.
-                                  // Re-applying bg removal is instant (cache hit).
 
   // ── LAYER 2: CROP STAGE ──────────────────────────────────────
   cropRect: CropRect | null;      // Pixel-crop coordinates from react-easy-crop
@@ -43,26 +50,39 @@ export type PhotoItem = {
   rotation: number;               // Degrees (-45 to 45)
   zoom: number;                   // 1.0 to 3.0
   croppedDataUrl?: string;        // CACHE: Canvas output after crop + rotation.
-                                  // Invalidated when bgRemoved, cropRect, or rotation changes.
 
   // ── LAYER 3: ADJUST STAGE ────────────────────────────────────
   brightness: number;             // 0–200% (100 = no change)
   contrast: number;               // 0–200% (100 = no change)
   sharpenAmount: number;          // 0–100%
   adjustedDataUrl?: string;       // CACHE: Canvas output after brightness/contrast/sharpen.
-                                  // Invalidated when croppedDataUrl or any adjust value changes.
 
   // ── CAPTION STAGE ────────────────────────────────────────────
   caption?: PhotoCaption;         // Optional text overlay (name, date, etc.)
+};
 
-  // ── PRINT SETTINGS (per-photo) ───────────────────────────────
+export type PhotoPrintSettings = {
+  photoId: string;
   printSize: PrintSize;
-  isSelectedForPrint: boolean;    // Checkbox in Layout gallery
-  printCopies: number;            // Number input: how many copies of this photo to print
+  printCopies: number;
+  isSelectedForPrint: boolean;
+};
 
-  // ── STATUS ───────────────────────────────────────────────────
-  status: "imported" | "bg-processed" | "cropped" | "adjusted" | "ready";
+// For backward compatibility on the editor side
+export type PhotoItem = PhotoCore & PhotoLayers;
 
-  // ── CLEANUP ──────────────────────────────────────────────────
-  _blobUrlsToCleanup?: string[];
+import type { PageSizeKey } from "../lib/layoutEngine";
+
+export type PrintSession = {
+  id: string;
+  pageSize: PageSizeKey;
+  marginMm: number;
+  gapMm: number;
+  cols?: number;
+  borderMm: number;
+  borderColor: string;
+  showCutLines: boolean;
+  cutLineColor: string;
+  
+  photoSettings: Record<string, PhotoPrintSettings>;
 };

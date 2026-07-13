@@ -23,6 +23,7 @@ interface EditStageProps {
 export function EditStage({ photoId, activeTab }: EditStageProps) {
   const photo = usePhotoStore(state => state.photos.find(p => p.id === photoId));
   const updatePhoto = usePhotoStore(state => state.updatePhoto);
+  const printSession = usePhotoStore(state => state.printSession);
 
   // Hook handles Layer 2/3 cache generation and AI bg removal
   const {
@@ -36,7 +37,9 @@ export function EditStage({ photoId, activeTab }: EditStageProps) {
 
   if (!photo) return null;
 
-  const preset = PRESETS.find(p => p.name === photo.printSize?.name) || PRESETS[0];
+  const currentSettings = printSession.photoSettings[photo.id];
+  const currentPrintSizeName = currentSettings?.printSize?.name || "Passport";
+  const preset = PRESETS.find(p => p.name === currentPrintSizeName) || PRESETS[0];
   const aspect = preset.width > 0 ? preset.width / preset.height : 1;
 
   // ── Main workspace area ──

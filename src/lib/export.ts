@@ -1,8 +1,10 @@
 import { jsPDF } from "jspdf";
 import type { PhotoItem } from "../types/photo";
 import { getDisplayUrl } from "./photoUtils";
-import { computeLayout, PAGE_SIZES, type PrintSettings } from "./layoutEngine";
-import { drawPhotoCell, PRINT_DPI } from "./photoRenderer";
+import { computeLayout, PAGE_SIZES } from "./layoutEngine";
+import type { PrintSession } from "../types/photo";
+import { PRINT_DPI, drawPhotoCell } from "./photoRenderer";
+import { getCanvasContext } from "./canvas";
 
 const MM_TO_PX = PRINT_DPI / 25.4; // ~11.811 pixels per mm at 300 DPI
 
@@ -25,10 +27,10 @@ function loadImage(src: string): Promise<HTMLImageElement> {
 // ─────────────────────────────────────────────────────────────────
 export async function generatePrintSheets(
   photos: PhotoItem[],
-  settings: PrintSettings
+  session: PrintSession
 ): Promise<Blob[]> {
   // Any photo with copies > 0 is included — no separate checkbox needed
-  const selected = photos.filter(p => p.printCopies > 0);
+  const selected = photos.filter(p => (session.photoSettings[p.id]?.printCopies || 0) > 0);
   if (selected.length === 0) return [];
 
   // Load all images in parallel
@@ -40,22 +42,25 @@ export async function generatePrintSheets(
   }));
 
   // Auto-calculate columns the same way the preview does
-  const pageDim = PAGE_SIZES[settings.pageSize];
-  const maxPhotoWidthMm = Math.max(...selected.map(p => p.printSize.widthMm || 35));
-  const availableWidth = pageDim.w - settings.marginMm * 2;
+  const pageDim = PAGE_SIZES[session.pageSize];
+  const maxPhotoWidthMm = Math.max(...selected.map(p => session.photoSettings[p.id]?.printSize.widthMm || 35));
+  const availableWidth = pageDim.w - session.marginMm * 2;
   const autoCols = Math.max(1, Math.floor(
-    (availableWidth + settings.gapMm) / (maxPhotoWidthMm + settings.gapMm)
+    (availableWidth + session.gapMm) / (maxPhotoWidthMm + session.gapMm)
   ));
 
   // Build the layout using the same auto-cols as the preview
   const layoutResult = computeLayout(
-    { ...settings, cols: autoCols },
-    selected.map(p => ({
-      photoId: p.id,
-      widthMm: p.printSize.widthMm || 35,
-      heightMm: p.printSize.heightMm || 45,
-      copies: p.printCopies,
-    }))
+    { ...session, cols: autoCols },
+    selected.map(p => {
+      const s = session.photoSettings[p.id];
+      return {
+        photoId: p.id,
+        widthMm: s?.printSize.widthMm || 35,
+        heightMm: s?.printSize.heightMm || 45,
+        copies: s?.printCopies || 0,
+      };
+    })
   );
 
   const canvasW = Math.round(pageDim.w * MM_TO_PX);
@@ -68,8 +73,7 @@ export async function generatePrintSheets(
     const canvas = document.createElement("canvas");
     canvas.width = canvasW;
     canvas.height = canvasH;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Cannot get 2d context");
+    const ctx = getCanvasContext(canvas, "2d");
 
     // White page background
     ctx.fillStyle = "#ffffff";
@@ -89,7 +93,7 @@ export async function generatePrintSheets(
       const yPx = Math.round(cell.yMm * MM_TO_PX);
       const wPx = Math.round(cell.widthMm * MM_TO_PX);
       const hPx = Math.round(cell.heightMm * MM_TO_PX);
-      drawPhotoCell(ctx, img, photo, xPx, yPx, wPx, hPx, PRINT_DPI, settings);
+      drawPhotoCell(ctx, img, photo, xPx, yPx, wPx, hPx, PRINT_DPI, session);
     }
 
     const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/jpeg", 0.95));
@@ -101,17 +105,11 @@ export async function generatePrintSheets(
   return pageBlobs;
 }
 
-// ─────────────────────────────────────────────────────────────────
-// Legacy single-photo convenience wrappers (kept for compatibility)
-// ─────────────────────────────────────────────────────────────────
-
-import { DEFAULT_PRINT_SETTINGS } from "./layoutEngine";
-
-export async function downloadPDF(photos: PhotoItem[], settings: PrintSettings = DEFAULT_PRINT_SETTINGS) {
-  const blobs = await generatePrintSheets(photos, settings);
+export async function downloadPDF(photos: PhotoItem[], session: PrintSession) {
+  const blobs = await generatePrintSheets(photos, session);
   if (blobs.length === 0) return;
 
-  const pageDim = PAGE_SIZES[settings.pageSize];
+  const pageDim = PAGE_SIZES[session.pageSize];
   const pdf = new jsPDF({
     orientation: pageDim.w > pageDim.h ? "landscape" : "portrait",
     unit: "mm",
@@ -130,8 +128,8 @@ export async function downloadPDF(photos: PhotoItem[], settings: PrintSettings =
   pdf.save("piko-photos.pdf");
 }
 
-export async function downloadImage(photos: PhotoItem[], settings: PrintSettings = DEFAULT_PRINT_SETTINGS) {
-  const blobs = await generatePrintSheets(photos, settings);
+export async function downloadImage(photos: PhotoItem[], session: PrintSession) {
+  const blobs = await generatePrintSheets(photos, session);
   if (blobs.length === 0) return;
 
   blobs.forEach((blob, i) => {
