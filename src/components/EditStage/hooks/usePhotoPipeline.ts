@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getCroppedImg, getSharpenedImg } from "../../../lib/canvas";
+import { getCroppedImg, getAdjustedImg } from "../../../lib/canvas";
 import { getSourceForCrop } from "../../../lib/photoUtils";
 import { removeBg } from "../../../lib/bgRemoval";
 import type { PhotoItem } from "../../../types/photo";
@@ -33,12 +33,16 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [photo?.id, photo?.cropRect, photo?.rotation, photo?.bgRemoved, photo?.bgRemovedDataUrl, updatePhoto]);
 
-  // Layer 3: regenerate adjustedDataUrl when sharpen changes
+  // Layer 3: regenerate adjustedDataUrl when brightness, contrast, or sharpen changes
   useEffect(() => {
     if (!photo) return;
     if (adjustTimerRef.current) clearTimeout(adjustTimerRef.current);
 
-    if (!photo.sharpenAmount || photo.sharpenAmount <= 0) {
+    const b = photo.brightness ?? 100;
+    const c = photo.contrast ?? 100;
+    const s = photo.sharpenAmount ?? 0;
+
+    if (b === 100 && c === 100 && s <= 0) {
       updatePhoto(photo.id, { adjustedDataUrl: undefined });
       return;
     }
@@ -47,10 +51,10 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
 
     adjustTimerRef.current = setTimeout(async () => {
       try {
-        const sharpened = await getSharpenedImg(photo.croppedDataUrl!, photo.sharpenAmount || 0);
-        updatePhoto(photo.id, { adjustedDataUrl: sharpened, status: "adjusted" });
+        const adjusted = await getAdjustedImg(photo.croppedDataUrl!, b, c, s);
+        updatePhoto(photo.id, { adjustedDataUrl: adjusted, status: "adjusted" });
       } catch (e) {
-        console.error("Sharpen failed:", e);
+        console.error("Adjustment failed:", e);
       }
     }, 400);
 
@@ -58,7 +62,7 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
       if (adjustTimerRef.current) clearTimeout(adjustTimerRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [photo?.id, photo?.sharpenAmount, photo?.croppedDataUrl, updatePhoto]);
+  }, [photo?.id, photo?.brightness, photo?.contrast, photo?.sharpenAmount, photo?.croppedDataUrl, updatePhoto]);
 
   // BG removal handlers
   const handleRemoveBg = async () => {

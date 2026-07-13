@@ -73,7 +73,7 @@ export async function getCroppedImg(
   return croppedCanvas.toDataURL("image/png"); // PNG preserves transparency from BG removal
 }
 
-export async function getSharpenedImg(imageSrc: string, sharpen: number): Promise<string> {
+export async function getAdjustedImg(imageSrc: string, brightness: number, contrast: number, sharpen: number): Promise<string> {
   const image = await createImage(imageSrc);
   const canvas = document.createElement("canvas");
   canvas.width = image.width;
@@ -81,7 +81,9 @@ export async function getSharpenedImg(imageSrc: string, sharpen: number): Promis
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("No 2d context");
 
+  ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
   ctx.drawImage(image, 0, 0);
+  ctx.filter = "none";
 
   if (sharpen > 0) {
     applySharpen(ctx, canvas.width, canvas.height, sharpen / 100);

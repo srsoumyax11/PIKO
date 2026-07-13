@@ -70,10 +70,17 @@ export function drawPhotoCell(
   const borderPx = Math.round(mmToPx(settings.borderMm || 0, dpi));
 
   // 1. Fill cell background (= border color when border > 0)
-  ctx.fillStyle = settings.borderMm > 0
-    ? (settings.borderColor || "#ffffff")
-    : (photo.bgColor && photo.bgColor !== "transparent" ? photo.bgColor : "#ffffff");
-  ctx.fillRect(xPx, yPx, wPx, hPx);
+  if (settings.borderMm > 0) {
+    if (settings.borderColor && settings.borderColor !== "transparent") {
+      ctx.fillStyle = settings.borderColor;
+      ctx.fillRect(xPx, yPx, wPx, hPx);
+    }
+  } else {
+    if (photo.bgColor && photo.bgColor !== "transparent") {
+      ctx.fillStyle = photo.bgColor;
+      ctx.fillRect(xPx, yPx, wPx, hPx);
+    }
+  }
 
   // 2. Determine image draw area
   const imgX = xPx + borderPx;
@@ -82,14 +89,13 @@ export function drawPhotoCell(
   const imgH = hPx - borderPx * 2;
 
   // 3. Fill photo background color inside the image area (if not transparent)
-  ctx.fillStyle = photo.bgColor && photo.bgColor !== "transparent" ? photo.bgColor : "#ffffff";
-  ctx.fillRect(imgX, imgY, imgW, imgH);
+  if (photo.bgColor && photo.bgColor !== "transparent") {
+    ctx.fillStyle = photo.bgColor;
+    ctx.fillRect(imgX, imgY, imgW, imgH);
+  }
 
-  // 4. Apply brightness + contrast CSS filter
-  const brightness = photo.brightness ?? 100;
-  const contrast   = photo.contrast   ?? 100;
-  ctx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
-
+  // 4. (Removed) Brightness + contrast are now pre-baked into adjustedDataUrl.
+  
   // 5. Draw image with OBJECT-FIT: COVER math
   const scaleX = imgW / img.naturalWidth;
   const scaleY = imgH / img.naturalHeight;
@@ -106,8 +112,6 @@ export function drawPhotoCell(
   ctx.clip();
   ctx.drawImage(img, offsetX, offsetY, scaledW, scaledH);
   ctx.restore();
-  
-  ctx.filter = "none";
 
   // 6. Cut lines
   if (settings.showCutLines) {
