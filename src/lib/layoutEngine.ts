@@ -73,7 +73,27 @@ export function computeLayout(
   const pageDim = PAGE_SIZES[settings.pageSize];
   const { marginMm, gapMm, cols } = settings;
 
+  if (cols <= 0) {
+    throw new Error('cols must be > 0');
+  }
+  if (marginMm < 0 || gapMm < 0) {
+    throw new Error('margins and gaps must be >= 0');
+  }
+
+  for (const photo of photos) {
+    if (photo.widthMm <= 0 || photo.heightMm <= 0) {
+      throw new Error(`Photo dimensions must be > 0: ${photo.widthMm}×${photo.heightMm}mm`);
+    }
+    if (photo.copies <= 0) {
+      throw new Error(`Photo copies must be > 0: ${photo.copies}`);
+    }
+  }
+
   const availableWidth = pageDim.w - marginMm * 2;
+  
+  if (availableWidth <= 0) {
+    throw new Error(`Margins too large: ${marginMm}mm each side. Page width: ${pageDim.w}mm`);
+  }
 
   const cells: ComputedCell[] = [];
   let pageIndex = 0;
