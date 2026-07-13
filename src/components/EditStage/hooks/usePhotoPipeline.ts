@@ -81,7 +81,10 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
           });
         }
       );
-      if (cancelBgRef.current) return;
+      if (cancelBgRef.current) {
+        URL.revokeObjectURL(url);
+        return;
+      }
       setBgProgress("Finishing up...");
       await new Promise(r => setTimeout(r, 300));
       updatePhoto(photo.id, {
@@ -92,8 +95,13 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
         adjustedDataUrl: undefined,
         status: "bg-processed",
       });
-    } catch (e) {
-      console.error("BG removal failed", e);
+    } catch (error) {
+      console.error("BG removal failed", error);
+      let errorMsg = "Background removal failed. Please try again.";
+      if (error instanceof Error) {
+        errorMsg = error.message;
+      }
+      alert(errorMsg);
     } finally {
       setIsRemovingBg(false);
       setBgProgress("");
