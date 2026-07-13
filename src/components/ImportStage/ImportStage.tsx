@@ -1,18 +1,26 @@
 import React, { useRef, useState } from "react";
 import { usePhotoStore } from "../../store/usePhotoStore";
 import type { PhotoItem } from "../../types/photo";
+import { validateImageFile } from "../../lib/fileValidator";
 
 export function ImportStage() {
   const addPhotos = usePhotoStore(state => state.addPhotos);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const handleFiles = (files: FileList | null) => {
+  const handleFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
     const newPhotos: PhotoItem[] = [];
+    const errors: string[] = [];
 
-    Array.from(files).forEach((file) => {
+    for (const file of Array.from(files)) {
+      const validation = await validateImageFile(file);
+      if (!validation.valid) {
+        errors.push(`${file.name}: ${validation.error}`);
+        continue;
+      }
+
       const originalDataUrl = URL.createObjectURL(file);
       
       const newPhoto: PhotoItem = {
@@ -44,9 +52,14 @@ export function ImportStage() {
       };
       
       newPhotos.push(newPhoto);
-    });
+    }
 
-    addPhotos(newPhotos);
+    if (errors.length > 0) {
+      alert(errors.join('\n'));
+    }
+    if (newPhotos.length > 0) {
+      addPhotos(newPhotos);
+    }
   };
 
   const onDragOver = (e: React.DragEvent) => {
