@@ -40,7 +40,7 @@ export function BackgroundPanel({
             <Button variant="ghost" style={{ flex: 1 }} onClick={handleRemoveBg}>⟳ Redo AI</Button>
           </div>
         ) : (
-          <Button variant="primary" fullWidth onClick={handleRemoveBg}>
+          <Button variant="ghost" fullWidth onClick={handleRemoveBg}>
             ✦ Remove Background
           </Button>
         )}
