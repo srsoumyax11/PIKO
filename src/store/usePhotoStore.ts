@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { PhotoItem } from "../types/photo";
 import { DEFAULT_PRINT_SETTINGS, type PrintSettings } from "../lib/layoutEngine";
+import { validatePrintSettings } from "../lib/validation";
 import { revokePhotoUrls } from "../lib/photoCleanup";
 
 interface PhotoStore {
@@ -36,7 +37,12 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
     };
   }),
   
-  updatePrintSettings: (updates) => set((state) => ({
-    printSettings: { ...state.printSettings, ...updates }
-  }))
+  updatePrintSettings: (updates) => set((state) => {
+    const validated = validatePrintSettings(updates);
+    if (!validated) {
+      console.warn("Invalid print settings update ignored");
+      return state;
+    }
+    return { printSettings: { ...state.printSettings, ...validated } };
+  })
 }));
