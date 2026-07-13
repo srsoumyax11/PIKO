@@ -31,7 +31,10 @@ export function Topbar() {
 
   return (
     <header className="app-header">
-      <div className="wordmark"><span className="wordmark-mark">[]</span> Piko</div>
+      <div className="wordmark" style={{ display: 'flex', alignItems: 'center' }}>
+        <img src="/android-chrome-192x192.png" alt="Piko Logo" style={{ height: '60px', width: '60px', borderRadius: '4px' }} />
+        Piko
+      </div>
       <div className="header-toolbar">
         <Button variant="ghost">↶ Undo</Button>
         <Button variant="ghost">↷ Redo</Button>

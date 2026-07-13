@@ -1,6 +1,5 @@
 <div align="center">
-  <!-- Replace with your actual logo image path -->
-  <img src="docs/logo-placeholder.png" alt="PIKO Logo" width="200" />
+  <img src="public/android-chrome-512x512.png" alt="PIKO Logo" width="200" />
 
 # PIKO
 
