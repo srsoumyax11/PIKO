@@ -126,7 +126,7 @@ export function drawPhotoCell(
   // 8. Caption
   if (photo.caption && photo.caption.text.trim()) {
     const cap = photo.caption;
-    const fPx = Math.round(ptToPx(cap.fontSize, dpi));
+    const fPx = ptToPx(cap.fontSize, dpi); // Removed Math.round() for accurate scaling!
     ctx.font = `${cap.bold ? "bold " : ""}${fPx}px ${cap.fontFamily}`;
     ctx.textBaseline = "middle";
     ctx.textAlign = cap.align;

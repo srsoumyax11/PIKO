@@ -9,11 +9,11 @@
 export type PageSizeKey = "A4" | "4x6 in" | "6x4 in" | "5x7 in" | "Letter";
 
 export const PAGE_SIZES: Record<PageSizeKey, { w: number; h: number; label: string }> = {
-  "A4":      { w: 210,   h: 297,   label: "A4 (210×297mm)" },
-  "4x6 in":  { w: 101.6, h: 152.4, label: "4×6 inch" },
-  "6x4 in":  { w: 152.4, h: 101.6, label: "6x4 inch"},
-  "5x7 in":  { w: 127,   h: 177.8, label: "5×7 inch" },
-  "Letter":  { w: 215.9, h: 279.4, label: "Letter (US)" },
+  "A4": { w: 210, h: 297, label: "A4 (210×297mm)" },
+  "4x6 in": { w: 101.6, h: 152.4, label: "4×6 inch" },
+  "6x4 in": { w: 152.4, h: 101.6, label: "6x4 inch" },
+  "5x7 in": { w: 127, h: 177.8, label: "5×7 inch" },
+  "Letter": { w: 215.9, h: 279.4, label: "Letter (US)" },
 };
 
 export type PrintSettings = {
@@ -77,7 +77,7 @@ export function computeLayout(
 
   const cells: ComputedCell[] = [];
   let pageIndex = 0;
-  
+
   // Build the full queue: expand each photo by its copy count
   const queue: Array<{ photoId: string; widthMm: number; heightMm: number }> = [];
   for (const p of photos) {
@@ -94,17 +94,19 @@ export function computeLayout(
     // Collect items for the next row
     const rowItems: Array<{ photoId: string; widthMm: number; heightMm: number; copyIndex: number }> = [];
     let rowWidth = 0;
-    
-    // Fill the row up to `cols` items
-    while (rowItems.length < cols && qIdx < queue.length) {
+
+    // Fill the row dynamically until it overflows the page width
+    while (qIdx < queue.length) {
       const item = queue[qIdx];
-      // If we strictly follow the 'cols' setting (which is computed dynamically to fit the max width),
-      // we assume they fit. The math in LayoutPanel calculates autoCols based on the max width.
-      rowItems.push({ ...item, copyIndex: qIdx });
-      rowWidth += item.widthMm;
-      if (rowItems.length > 1) {
-        rowWidth += gapMm;
+      const spaceNeeded = rowItems.length === 0 ? item.widthMm : gapMm + item.widthMm;
+      
+      // If adding this item exceeds available width (and the row isn't empty), move to next row
+      if (rowWidth + spaceNeeded > availableWidth && rowItems.length > 0) {
+        break;
       }
+      
+      rowItems.push({ ...item, copyIndex: qIdx });
+      rowWidth += spaceNeeded;
       qIdx++;
     }
 

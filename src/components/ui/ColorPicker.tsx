@@ -1,3 +1,5 @@
+import { Slider } from "./Slider";
+
 interface ColorPickerProps {
   label: string;
   value: string;
@@ -6,7 +8,26 @@ interface ColorPickerProps {
   hidePresets?: boolean;
 }
 
+function parseColor(val: string) {
+  if (val === "transparent") return { hex: "#000000", a: 0 };
+  if (val.startsWith("#")) {
+    const hex = val.slice(0, 7);
+    const aHex = val.slice(7, 9);
+    const a = aHex ? parseInt(aHex, 16) / 255 : 1;
+    return { hex: hex.padEnd(7, "0"), a: Math.round(a * 100) };
+  }
+  return { hex: "#ffffff", a: 100 };
+}
+
+function formatColor(hex: string, a: number) {
+  if (a === 0) return "transparent";
+  if (a === 100) return hex;
+  const alphaHex = Math.round((a / 100) * 255).toString(16).padStart(2, "0");
+  return `${hex}${alphaHex}`;
+}
+
 export function ColorPicker({ label, value, onChange, allowTransparent, hidePresets }: ColorPickerProps) {
+  const { hex, a } = parseColor(value);
   const isTransparent = value === "transparent";
 
   const presets = [
@@ -53,8 +74,8 @@ export function ColorPicker({ label, value, onChange, allowTransparent, hidePres
           />
           <input 
             type="color" 
-            value={isTransparent ? "#000000" : value} 
-            onChange={(e) => onChange(e.target.value)} 
+            value={hex} 
+            onChange={(e) => onChange(formatColor(e.target.value, a))} 
             style={{ 
               position: "absolute", inset: 0, opacity: 0, cursor: "pointer", width: "100%", height: "100%"
             }} 
@@ -62,6 +83,20 @@ export function ColorPicker({ label, value, onChange, allowTransparent, hidePres
           />
         </div>
       </div>
+      
+      {!isTransparent && (
+        <div style={{ marginTop: "12px" }}>
+          <Slider
+            label="Opacity"
+            value={a}
+            min={0}
+            max={100}
+            step={1}
+            unit="%"
+            onChange={(newA) => onChange(formatColor(hex, newA))}
+          />
+        </div>
+      )}
     </div>
   );
 }

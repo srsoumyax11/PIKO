@@ -38,12 +38,6 @@ export function Topbar() {
         <img src="/android-chrome-192x192.png" alt="Piko Logo" style={{ height: '60px', width: '60px', borderRadius: '4px' }} />
         Piko
       </div>
-      <div className="header-toolbar">
-        <Button variant="ghost">↶ Undo</Button>
-        <Button variant="ghost">↷ Redo</Button>
-        <div style={{ width: "1px", height: "24px", background: "var(--line)", margin: "0 8px" }} />
-        <Button variant="ghost">Fit</Button>
-      </div>
       <div style={{ display: "flex", gap: "8px" }}>
         <Button
           variant="primary"

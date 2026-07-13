@@ -18,8 +18,8 @@ const INP: React.CSSProperties = {
 
 export function CaptionPanel({ photo, updatePhoto }: CaptionPanelProps) {
   const cap = photo.caption ?? {
-    text: "", fontSize: 8, fontFamily: "Arial", color: "#000000",
-    bgColor: "transparent", position: "overlay-bottom" as CaptionPosition, bold: false, align: "center" as const,
+    text: "", fontSize: 8, fontFamily: "Arial", color: "#ffffff",
+    bgColor: "#00000080", position: "overlay-bottom" as CaptionPosition, bold: false, align: "center" as const,
   };
 
   const upd = (u: Partial<PhotoCaption>) => updatePhoto(photo.id, { caption: { ...cap, ...u } });
