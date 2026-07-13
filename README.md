@@ -75,7 +75,7 @@ PIKO is built with modern, high-performance web technologies:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/PIKO.git
+git clone https://github.com/srsoumyax11/piko
 
 # 2. Install dependencies (Bun recommended)
 bun install

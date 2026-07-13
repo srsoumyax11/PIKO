@@ -38,7 +38,7 @@ export function PreviewWorkspace({ photo, aspect }: PreviewWorkspaceProps) {
       <div style={{
         position: "absolute", left: 0, right: 0,
         [cap.position === "overlay-top" ? "top" : "bottom"]: 0,
-        backgroundColor: cap.bgColor && cap.bgColor !== "transparent" ? cap.bgColor : "rgba(0,0,0,0.5)",
+        backgroundColor: cap.bgColor && cap.bgColor !== "transparent" ? cap.bgColor : "transparent",
         padding: `${Math.round(fPx * 0.25)}px ${Math.round(fPx * 0.5)}px`,
         textAlign: cap.align, fontFamily: cap.fontFamily,
         fontSize: `${fPx}px`, fontWeight: cap.bold ? "bold" : "normal",
