@@ -60,7 +60,8 @@ PIKO generates a perfectly spaced, high-resolution layout grid.
 </div>
 
 <!-- Gif video showing the entire pipeline working in browser -->
-![Uploading animation.gif…]()
+<img  alt="image" src="https://github.com/user-attachments/assets/93d3d63d-ee27-433c-8211-9e996efdd248"/>
+
 
 ---
 
