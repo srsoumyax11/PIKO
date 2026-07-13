@@ -7,6 +7,20 @@ import { PRINT_DPI, drawPhotoCell } from "./photoRenderer";
 import { getCanvasContext } from "./canvas";
 
 const MM_TO_PX = PRINT_DPI / 25.4; // ~11.811 pixels per mm at 300 DPI
+const MAX_CANVAS_PIXEL_COUNT = 4096 * 4096; // ~65 megapixels max
+
+function validateCanvasDimensions(widthPx: number, heightPx: number): void {
+  const pixelCount = widthPx * heightPx;
+  if (pixelCount > MAX_CANVAS_PIXEL_COUNT) {
+    throw new Error(
+      `Canvas dimensions too large: ${widthPx}×${heightPx} (${pixelCount} pixels). ` +
+      `Max: ${MAX_CANVAS_PIXEL_COUNT} pixels.`
+    );
+  }
+  if (widthPx <= 0 || heightPx <= 0) {
+    throw new Error(`Invalid canvas dimensions: ${widthPx}×${heightPx}`);
+  }
+}
 
 // ─────────────────────────────────────────────────────────────────
 // Image loader helper
@@ -65,6 +79,8 @@ export async function generatePrintSheets(
 
   const canvasW = Math.round(pageDim.w * MM_TO_PX);
   const canvasH = Math.round(pageDim.h * MM_TO_PX);
+
+  validateCanvasDimensions(canvasW, canvasH);
 
   // Render one canvas per page
   const pageBlobs: Blob[] = [];
