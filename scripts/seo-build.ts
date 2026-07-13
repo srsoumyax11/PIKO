@@ -44,6 +44,13 @@ ${urls.join('\n')}
   
   fs.writeFileSync(path.join(PUBLIC_DIR, 'sitemap.xml'), sitemapContent);
   console.log(`✅ sitemap.xml generated with ${urls.length} URLs!`);
+  
+  const robotsContent = `User-agent: *
+Allow: /
+
+Sitemap: ${APP_DOMAIN}/sitemap.xml`;
+  fs.writeFileSync(path.join(PUBLIC_DIR, 'robots.txt'), robotsContent);
+  console.log(`✅ robots.txt generated!`);
 }
 
 async function prerender() {
