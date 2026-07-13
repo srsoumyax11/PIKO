@@ -27,6 +27,7 @@ export function ImportStage() {
         id: crypto.randomUUID(),
         originalFile: file,
         originalDataUrl,
+        _blobUrlsToCleanup: [originalDataUrl],
         // Layer 1: Background
         bgRemoved: false,
         bgColor: "#ffffff",

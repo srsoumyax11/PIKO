@@ -2,7 +2,8 @@ import { removeBackground } from "@imgly/background-removal";
 
 export async function removeBg(
   imageSource: string | Blob, 
-  onProgress: (progress: string) => void
+  onProgress: (progress: string) => void,
+  trackUrl?: (url: string) => void
 ): Promise<string> {
   const config = {
     progress: (key: string, current: number, total: number) => {
@@ -19,6 +20,11 @@ export async function removeBg(
   
   // Changed from imglyRemoveBackground to removeBackground
   const blob = await removeBackground(imageSource, config);
+  const url = URL.createObjectURL(blob);
   
-  return URL.createObjectURL(blob);
+  if (trackUrl) {
+    trackUrl(url);
+  }
+  
+  return url;
 }

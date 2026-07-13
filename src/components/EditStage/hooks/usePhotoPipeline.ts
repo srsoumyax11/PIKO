@@ -72,9 +72,15 @@ export function usePhotoPipeline(photo: PhotoItem | undefined, updatePhoto: (id:
     setBgProgress("Initializing AI...");
     
     try {
-      const url = await removeBg(photo.originalDataUrl, (progress) => {
-        setBgProgress(progress);
-      });
+      const url = await removeBg(
+        photo.originalDataUrl, 
+        (progress) => setBgProgress(progress),
+        (blobUrl) => {
+          updatePhoto(photo.id, {
+            _blobUrlsToCleanup: [...(photo._blobUrlsToCleanup || []), blobUrl]
+          });
+        }
+      );
       if (cancelBgRef.current) return;
       setBgProgress("Finishing up...");
       await new Promise(r => setTimeout(r, 300));

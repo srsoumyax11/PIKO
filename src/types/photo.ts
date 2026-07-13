@@ -62,4 +62,7 @@ export type PhotoItem = {
 
   // ── STATUS ───────────────────────────────────────────────────
   status: "imported" | "bg-processed" | "cropped" | "adjusted" | "ready";
+
+  // ── CLEANUP ──────────────────────────────────────────────────
+  _blobUrlsToCleanup?: string[];
 };

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import type { PhotoItem } from "../types/photo";
 import { DEFAULT_PRINT_SETTINGS, type PrintSettings } from "../lib/layoutEngine";
+import { revokePhotoUrls } from "../lib/photoCleanup";
 
 interface PhotoStore {
   photos: PhotoItem[];
@@ -25,9 +26,15 @@ export const usePhotoStore = create<PhotoStore>((set) => ({
     )
   })),
   
-  removePhoto: (id) => set((state) => ({
-    photos: state.photos.filter((photo) => photo.id !== id)
-  })),
+  removePhoto: (id) => set((state) => {
+    const photo = state.photos.find(p => p.id === id);
+    if (photo) {
+      revokePhotoUrls(photo);
+    }
+    return {
+      photos: state.photos.filter((photo) => photo.id !== id)
+    };
+  }),
   
   updatePrintSettings: (updates) => set((state) => ({
     printSettings: { ...state.printSettings, ...updates }

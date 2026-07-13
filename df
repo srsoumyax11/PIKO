@@ -1,9 +1,0 @@
-- The Canvas is not showing in layout page 
-- The Canvas now should look like the exact paper he chose in Page size dropdown
-- And changing the values of margin, gap, border and other should reflect on canvas live
-- And the image size is mm fixed. Do not change the size of the image. 
-- See in the image same photo same size all details same but adding a margin of 1 changes the image from small to big means the image which is 35 x 45 is now bigger to fill the gap 
-You should fill the gap only with white colour 
-_ tell me what you have under stand 
-And tell me how this can be solved 
-MAke a planning 
