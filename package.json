@@ -5,10 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "tsc -b && vite build && bun run scripts/seo-build.ts",
     "lint": "oxlint",
-    "preview": "vite preview",
-    "start": ""
+    "preview": "vite preview"
   },
   "dependencies": {
     "@imgly/background-removal": "^1.7.0",
@@ -16,6 +15,8 @@
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-easy-crop": "^6.2.2",
+    "react-helmet-async": "^3.0.0",
+    "react-router-dom": "^7.18.1",
     "zustand": "^5.0.14"
   },
   "devDependencies": {

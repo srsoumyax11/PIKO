@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { usePhotoStore } from "../../store/usePhotoStore";
 import { usePhotoPipeline } from "./hooks/usePhotoPipeline";
+import { SEO_COUNTRIES } from "../../lib/seoData";
 
 // Workspaces
 import { CropWorkspace } from "./workspaces/CropWorkspace";
@@ -17,12 +19,38 @@ import { LayoutPanel } from "./panels/LayoutPanel";
 interface EditStageProps {
   photoId: string;
   activeTab: string;
+  initialDocId?: string;
 }
 
-export function EditStage({ photoId, activeTab }: EditStageProps) {
+export function EditStage({ photoId, activeTab, initialDocId }: EditStageProps) {
   const photo = usePhotoStore(state => state.photos.find(p => p.id === photoId));
   const updatePhoto = usePhotoStore(state => state.updatePhoto);
   const printSession = usePhotoStore(state => state.printSession);
+  const updatePhotoPrintSettings = usePhotoStore(state => state.updatePhotoPrintSettings);
+
+  // If we have SEO-driven initial doc ID, apply it to the photo settings on first mount
+  useEffect(() => {
+    if (photo && initialDocId) {
+      const currentSettings = printSession.photoSettings[photo.id];
+      if (!currentSettings || currentSettings.printSize.name === "Passport") {
+        // Find the document
+        let targetDoc = null;
+        for (const country of SEO_COUNTRIES) {
+          const found = country.documents.find(d => d.id === initialDocId);
+          if (found) {
+            targetDoc = found;
+            break;
+          }
+        }
+        
+        if (targetDoc) {
+          updatePhotoPrintSettings(photo.id, {
+            printSize: { name: targetDoc.id, widthMm: targetDoc.widthMm, heightMm: targetDoc.heightMm }
+          });
+        }
+      }
+    }
+  }, [photo, initialDocId, printSession.photoSettings, updatePhotoPrintSettings]);
 
   // Hook handles Layer 2/3 cache generation and AI bg removal
   const {

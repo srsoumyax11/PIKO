@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { usePhotoStore } from "../../store/usePhotoStore";
 import { downloadPDF, downloadImage } from "../../lib/export";
 import { Button } from "../ui/Button";
@@ -35,8 +36,10 @@ export function Topbar() {
   return (
     <header className="app-header">
       <div className="wordmark" style={{ display: 'flex', alignItems: 'center' }}>
-        <img src="/android-chrome-192x192.png" alt="Piko Logo" style={{ height: '60px', width: '60px', borderRadius: '4px' }} />
-        Piko
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'inherit' }}>
+          <img src="/android-chrome-192x192.png" alt="Piko Logo" style={{ height: '60px', width: '60px', borderRadius: '4px' }} />
+          Piko
+        </Link>
       </div>
       <div style={{ display: "flex", gap: "8px" }}>
         <Button

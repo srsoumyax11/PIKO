@@ -6,11 +6,16 @@ import { EditStage } from "./components/EditStage/EditStage";
 import { FooterFilmstrip } from "./components/FooterFilmstrip/FooterFilmstrip";
 import { Topbar } from "./components/layout/Topbar";
 import { SidebarLeft } from "./components/layout/SidebarLeft";
-import { TABS } from "./lib/constants";
+import { TABS, APP_DOMAIN } from "./lib/constants";
 import { Button } from "./components/ui/Button";
 import "./layout.css";
 
-function AppShell() {
+import { Routes, Route, useParams, Navigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
+import { getSeoDataFromSlug, getPageTitle, getPageDescription, getPageKeywords } from './lib/seoData';
+import { LandingPage } from './components/LandingPage/LandingPage';
+
+function AppShell({ initialDocId }: { initialDocId?: string }) {
   const [activePhotoId, setActivePhotoId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("Import");
   const photos = usePhotoStore(state => state.photos);
@@ -84,7 +89,11 @@ function AppShell() {
             </div>
           </section>
         ) : (
-          <EditStage photoId={activePhotoId} activeTab={activeTab} />
+          <EditStage 
+            photoId={activePhotoId} 
+            activeTab={activeTab} 
+            initialDocId={initialDocId} 
+          />
         )}
       </main>
 
@@ -117,8 +126,55 @@ function AppShell() {
   );
 }
 
+function EditorRoute() {
+  const { slug } = useParams();
+  
+  if (!slug) {
+    return <LandingPage />;
+  }
+
+  const seoData = getSeoDataFromSlug(slug);
+  
+  // If slug doesn't match any known combinations, fallback to general
+  if (!seoData) {
+    return <Navigate to="/" replace />;
+  }
+
+  const title = getPageTitle(seoData.country, seoData.doc);
+  const description = getPageDescription(seoData.country, seoData.doc);
+  const keywords = getPageKeywords(seoData.country, seoData.doc);
+
+  const canonicalUrl = `${APP_DOMAIN}/${slug}`;
+  const imageUrl = `${APP_DOMAIN}/social-banner.png`;
+
+  return (
+    <>
+      <Helmet>
+        <title>{title}</title>
+        <link rel="canonical" href={canonicalUrl} />
+        <meta name="title" content={title} />
+        <meta name="description" content={description} />
+        <meta name="keywords" content={keywords} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={imageUrl} />
+        <meta property="twitter:title" content={title} />
+        <meta property="twitter:description" content={description} />
+        <meta property="twitter:image" content={imageUrl} />
+      </Helmet>
+      <AppShell initialDocId={seoData.doc.id} />
+    </>
+  );
+}
+
 function App() {
-  return <AppShell />;
+  return (
+    <Routes>
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/:slug" element={<EditorRoute />} />
+    </Routes>
+  );
 }
 
 export default App;

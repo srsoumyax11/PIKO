@@ -1,5 +1,9 @@
 import type { CaptionPosition } from "../types/photo";
 
+// Change this single variable when you move to a custom domain!
+// e.g. "https://my-custom-domain.com"
+export const APP_DOMAIN = "https://piko-photo.vercel.app";
+
 export const TABS = [
   { id: "Import",     icon: "⇪" },
   { id: "Background", icon: "⚗" },
