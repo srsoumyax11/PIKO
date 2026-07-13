@@ -120,9 +120,8 @@ export function computeLayout(
       curY = marginMm;
     }
 
-    // Center this row horizontally within the available width
-    // Or if rowWidth > availableWidth, it might overflow, but we still center or start at margin.
-    const startX = marginMm + Math.max(0, (availableWidth - rowWidth) / 2);
+    // Align this row to the left margin
+    const startX = marginMm;
 
     let curX = startX;
     for (const item of rowItems) {
