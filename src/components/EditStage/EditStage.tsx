@@ -38,9 +38,9 @@ export function EditStage({ photoId, activeTab }: EditStageProps) {
   if (!photo) return null;
 
   const currentSettings = printSession.photoSettings[photo.id];
-  const currentPrintSizeName = currentSettings?.printSize?.name || "Passport";
-  const preset = PRESETS.find(p => p.name === currentPrintSizeName) || PRESETS[0];
-  const aspect = preset.width > 0 ? preset.width / preset.height : 1;
+  const w = currentSettings?.printSize?.widthMm || 35;
+  const h = currentSettings?.printSize?.heightMm || 45;
+  const aspect = w > 0 && h > 0 ? w / h : 1;
 
   // ── Main workspace area ──
   const renderWorkspace = () => {
