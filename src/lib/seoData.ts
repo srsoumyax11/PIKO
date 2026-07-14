@@ -3,7 +3,6 @@ export interface DocumentSpec {
   name: string;        // Human readable display name
   widthMm: number;
   heightMm: number;
-  aspectRatio: number; // calculated as widthMm / heightMm for canvas components
   recommendedPx?: {    // Useful if your backend needs minimum resolution guidelines
     width: number;
     height: number;
@@ -24,9 +23,9 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "us",
     popular: true,
     documents: [
-      { id: "us-passport", name: "Passport", widthMm: 51, heightMm: 51, aspectRatio: 1.0, recommendedPx: { width: 600, height: 600 }, notes: "White background, no glasses" },
-      { id: "us-visa", name: "Visa", widthMm: 51, heightMm: 51, aspectRatio: 1.0, recommendedPx: { width: 600, height: 600 }, notes: "White background" },
-      { id: "us-dv-lottery", name: "Green Card / DV Lottery", widthMm: 51, heightMm: 51, aspectRatio: 1.0, recommendedPx: { width: 600, height: 600 } }
+      { id: "us-passport", name: "Passport", widthMm: 51, heightMm: 51, recommendedPx: { width: 600, height: 600 }, notes: "White background, no glasses" },
+      { id: "us-visa", name: "Visa", widthMm: 51, heightMm: 51, recommendedPx: { width: 600, height: 600 }, notes: "White background" },
+      { id: "us-dv-lottery", name: "Green Card / DV Lottery", widthMm: 51, heightMm: 51, recommendedPx: { width: 600, height: 600 } }
     ]
   },
   {
@@ -34,8 +33,8 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "gb",
     popular: true,
     documents: [
-      { id: "gb-passport", name: "Passport", widthMm: 35, heightMm: 45, aspectRatio: 0.777, recommendedPx: { width: 750, height: 1050 }, notes: "Light grey or cream background" },
-      { id: "gb-driving-licence", name: "Driving Licence", widthMm: 35, heightMm: 45, aspectRatio: 0.777 }
+      { id: "gb-passport", name: "Passport", widthMm: 35, heightMm: 45, recommendedPx: { width: 750, height: 1050 }, notes: "Light grey or cream background" },
+      { id: "gb-driving-licence", name: "Driving Licence", widthMm: 35, heightMm: 45 }
     ]
   },
   {
@@ -43,11 +42,11 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "in",
     popular: true,
     documents: [
-      { id: "in-passport", name: "Passport (Official Global Standard)", widthMm: 51, heightMm: 51, aspectRatio: 1.0, notes: "Plain white background, 2x2 inches" },
-      { id: "in-passport-offline", name: "Passport (Local/Offline Alternative)", widthMm: 35, heightMm: 45, aspectRatio: 0.777, notes: "Used by specific regional seva kendras" },
-      { id: "in-visa", name: "Visa", widthMm: 51, heightMm: 51, aspectRatio: 1.0 },
-      { id: "in-pan", name: "PAN Card", widthMm: 25, heightMm: 35, aspectRatio: 0.714, notes: "Standard tax identity dimension" },
-      { id: "in-oci", name: "OCI (Overseas Citizenship)", widthMm: 51, heightMm: 51, aspectRatio: 1.0 }
+      { id: "in-passport", name: "Passport (Official Global Standard)", widthMm: 51, heightMm: 51, notes: "Plain white background, 2x2 inches" },
+      { id: "in-passport-offline", name: "Passport (Local/Offline Alternative)", widthMm: 35, heightMm: 45, notes: "Used by specific regional seva kendras" },
+      { id: "in-visa", name: "Visa", widthMm: 51, heightMm: 51 },
+      { id: "in-pan", name: "PAN Card", widthMm: 25, heightMm: 35, notes: "Standard tax identity dimension" },
+      { id: "in-oci", name: "OCI (Overseas Citizenship)", widthMm: 51, heightMm: 51 }
     ]
   },
   {
@@ -55,8 +54,8 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "eu",
     popular: true,
     documents: [
-      { id: "eu-visa", name: "Schengen Visa", widthMm: 35, heightMm: 45, aspectRatio: 0.777, notes: "Light background, strict biometric positioning" },
-      { id: "eu-passport", name: "Standard EU Passport", widthMm: 35, heightMm: 45, aspectRatio: 0.777 }
+      { id: "eu-visa", name: "Schengen Visa", widthMm: 35, heightMm: 45, notes: "Light background, strict biometric positioning" },
+      { id: "eu-passport", name: "Standard EU Passport", widthMm: 35, heightMm: 45 }
     ]
   },
   {
@@ -64,9 +63,9 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "jp",
     popular: false,
     documents: [
-      { id: "jp-passport", name: "Passport", widthMm: 35, heightMm: 45, aspectRatio: 0.777 },
-      { id: "jp-visa", name: "Visa", widthMm: 35, heightMm: 45, aspectRatio: 0.777, notes: "Standard tourist visa size" },
-      { id: "jp-residence", name: "Zairyu (Residence Card)", widthMm: 30, heightMm: 40, aspectRatio: 0.75 }
+      { id: "jp-passport", name: "Passport", widthMm: 35, heightMm: 45 },
+      { id: "jp-visa", name: "Visa", widthMm: 35, heightMm: 45, notes: "Standard tourist visa size" },
+      { id: "jp-residence", name: "Zairyu (Residence Card)", widthMm: 30, heightMm: 40 }
     ]
   },
   {
@@ -74,8 +73,8 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "cn",
     popular: false,
     documents: [
-      { id: "cn-passport", name: "Passport", widthMm: 33, heightMm: 48, aspectRatio: 0.687, notes: "White or light blue background" },
-      { id: "cn-visa", name: "Visa", widthMm: 33, heightMm: 48, aspectRatio: 0.687 }
+      { id: "cn-passport", name: "Passport", widthMm: 33, heightMm: 48, notes: "White or light blue background" },
+      { id: "cn-visa", name: "Visa", widthMm: 33, heightMm: 48 }
     ]
   },
   {
@@ -83,10 +82,10 @@ export const SEO_COUNTRIES: CountrySEOData[] = [
     code: "general",
     popular: false,
     documents: [
-      { id: "gen-2x2", name: "Standard 2x2 inches", widthMm: 51, heightMm: 51, aspectRatio: 1.0 },
-      { id: "gen-35x45", name: "Standard 35x45 mm (Biometric)", widthMm: 35, heightMm: 45, aspectRatio: 0.777 },
-      { id: "gen-30x40", name: "Standard 30x40 mm", widthMm: 30, heightMm: 40, aspectRatio: 0.75 },
-      { id: "gen-stamp", name: "Stamp Size", widthMm: 25, heightMm: 25, aspectRatio: 1.0, notes: "Small stamp size commonly used for forms" }
+      { id: "gen-2x2", name: "Standard 2x2 inches", widthMm: 51, heightMm: 51 },
+      { id: "gen-35x45", name: "Standard 35x45 mm (Biometric)", widthMm: 35, heightMm: 45 },
+      { id: "gen-30x40", name: "Standard 30x40 mm", widthMm: 30, heightMm: 40 },
+      { id: "gen-stamp", name: "Stamp Size", widthMm: 25, heightMm: 25, notes: "Small stamp size commonly used for forms" }
     ]
   }
 ];

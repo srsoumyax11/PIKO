@@ -34,8 +34,6 @@ export const FONT_FAMILIES = ["Arial", "Inter", "Georgia", "Courier New", "Times
 export const CAPTION_POSITIONS: { value: CaptionPosition; label: string }[] = [
   { value: "overlay-bottom", label: "Overlay — Bottom" },
   { value: "overlay-top",    label: "Overlay — Top"    },
-  { value: "below",          label: "Below Photo"       },
-  { value: "above",          label: "Above Photo"       },
 ];
 
 // Checkerboard CSS for transparent backgrounds

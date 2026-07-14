@@ -1,4 +1,4 @@
-export type CaptionPosition = "below" | "above" | "overlay-bottom" | "overlay-top";
+export type CaptionPosition = "overlay-bottom" | "overlay-top";
 
 export type PhotoCaption = {
   text: string;

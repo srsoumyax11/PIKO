@@ -154,8 +154,15 @@ export function LandingPage() {
                         onMouseOver={(e) => { e.currentTarget.style.backgroundColor = "var(--line)" }}
                         onMouseOut={(e) => { e.currentTarget.style.backgroundColor = "transparent" }}
                       >
-                        <div style={{ color: "var(--text)" }}>{doc.name}</div>
-                        <div style={{ fontSize: "12px", color: "var(--steel)", marginTop: "4px" }}>{doc.widthMm}x{doc.heightMm}mm • Aspect Ratio: {doc.aspectRatio}</div>
+                        <div className="landing-feature-card" style={{ padding: "16px" }}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                            <div>
+                              <h4 style={{ margin: "0 0 4px 0", fontSize: "16px", color: "var(--text)" }}>{doc.name}</h4>
+                              <div style={{ fontSize: "12px", color: "var(--steel)", marginTop: "4px" }}>{doc.widthMm}x{doc.heightMm}mm</div>
+                              {doc.notes && <div style={{ fontSize: "11px", color: "var(--steel)", marginTop: "8px", fontStyle: "italic" }}>* {doc.notes}</div>}
+                            </div>
+                          </div>
+                        </div>
                       </Link>
                     </li>
                   );
