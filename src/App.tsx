@@ -12,6 +12,7 @@ import "./layout.css";
 
 import { Routes, Route, useParams, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { Analytics } from '@vercel/analytics/react';
 import { getSeoDataFromSlug, getPageTitle, getPageDescription, getPageKeywords } from './lib/seoData';
 import { LandingPage } from './components/LandingPage/LandingPage';
 
@@ -170,10 +171,13 @@ function EditorRoute() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<LandingPage />} />
-      <Route path="/:slug" element={<EditorRoute />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/:slug" element={<EditorRoute />} />
+      </Routes>
+      <Analytics />
+    </>
   );
 }
 
